@@ -1,0 +1,31 @@
+---
+const currentPath = Astro.url.pathname;
+
+const navItems = [
+    { name: "Home", href: "/" },
+    { name: "Experiences", href: "/experiences" },
+    { name: "Projects", href: "/projects" },
+    { name: "Contact", href: "/contact" },
+];
+---
+
+<nav class="sticky top-0 w-full bg-black shadow-[0_2px_4px_rgba(0,0,0,0.3)] z-[1000]">
+    <div class="max-w-[1200px] mx-auto py-4 px-8 flex justify-center items-center">
+        <ul class="flex list-none gap-12 m-0 p-0">
+            {
+                navItems.map((item) => (
+                    <li>
+                        <a
+                            href={item.href}
+                            class={`text-white no-underline font-medium transition-colors duration-300 hover:text-gray-400 relative ${
+                                currentPath === item.href ? "after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-[2px] after:bg-white" : ""
+                            }`}
+                        >
+                            {item.name}
+                        </a>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
+</nav>
