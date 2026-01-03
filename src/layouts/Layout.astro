@@ -1,5 +1,6 @@
 ---
-import Navbar from '@/components/navbar.astro';
+import Navbar from '@/components/ui/navbar.astro';
+import Footer from '@/components/ui/footer.astro';
 import '@/styles/global.css'
 ---
 
@@ -10,11 +11,12 @@ import '@/styles/global.css'
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="" href="" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Zijie Wu</title>
+		<title>Zijie Wu | Portfolio</title>
 	</head>
 	
 	<body class="m-0 w-full h-full bg-black">
 		<Navbar />
 		<slot />
+		<Footer />
 	</body>
 </html>
