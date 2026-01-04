@@ -14,9 +14,11 @@ import '@/styles/global.css'
 		<title>Zijie Wu | Portfolio</title>
 	</head>
 	
-	<body class="m-0 w-full h-full bg-black">
+	<body class="m-0 w-full min-h-screen flex flex-col bg-black">
 		<Navbar />
-		<slot />
+		<div class="flex-1">
+			<slot />
+		</div>
 		<Footer />
 	</body>
 </html>
