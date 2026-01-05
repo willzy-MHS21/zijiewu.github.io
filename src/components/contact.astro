@@ -145,8 +145,8 @@ const WEB3FORMS_KEY = import.meta.env.PUBLIC_WEB3FORMS_KEY;
     </div>
 </section>
 
-<!-- Load hCaptcha script -->
-<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+<!-- Load hCaptcha script with reCaptchaCompat disabled -->
+<script src="https://js.hcaptcha.com/1/api.js?recaptchacompat=off" async defer></script>
 
 <script is:inline>
   const form = document.getElementById("contactForm");
