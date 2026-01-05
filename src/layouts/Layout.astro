@@ -1,6 +1,8 @@
 ---
+import { ViewTransitions } from 'astro:transitions';
 import Navbar from '@/components/ui/navbar.astro';
 import Footer from '@/components/ui/footer.astro';
+import Background from '@/components/background.astro';
 import '@/styles/global.css'
 ---
 
@@ -12,11 +14,38 @@ import '@/styles/global.css'
 		<link rel="icon" type="" href="" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Zijie Wu | Portfolio</title>
+		<ViewTransitions />
+		
+		<style is:global>
+			/* slower slide transition */
+			@keyframes slide-from-right {
+				from {
+					transform: translateX(100px);
+					opacity: 0;
+				}
+			}
+			
+			@keyframes slide-to-left {
+				to {
+					transform: translateX(-100px);
+					opacity: 0;
+				}
+			}
+			
+			::view-transition-old(slide) {
+				animation: 800ms ease-in-out both slide-to-left;
+			}
+			
+			::view-transition-new(slide) {
+				animation: 800ms ease-in-out both slide-from-right;
+			}
+		</style>
 	</head>
 	
 	<body class="m-0 w-full min-h-screen flex flex-col bg-black">
+		<Background />
 		<Navbar />
-		<div class="flex-1">
+		<div class="flex-1" transition:name="slide">
 			<slot />
 		</div>
 		<Footer />

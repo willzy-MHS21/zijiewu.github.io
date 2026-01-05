@@ -1,0 +1,133 @@
+<div id="matrix-bg" data-astro-transition-persist="matrix-background"></div>
+
+<script>
+    import * as THREE from "three";
+
+    if (!(window as any).matrixBgInitialized) {
+        const container = document.getElementById("matrix-bg");
+        if (!container) throw new Error("Matrix background container not found");
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+        scene.fog = new THREE.Fog(0x000000, 50, 200);
+
+        const camera = new THREE.PerspectiveCamera(
+            60,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000,
+        );
+        camera.position.set(0, 0, 100);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        // Code rain particles
+        const particleCount = 3000;
+        const positions = new Float32Array(particleCount * 3);
+        const velocities: number[] = [];
+        const opacities = new Float32Array(particleCount);
+
+        for (let i = 0; i < particleCount; i++) {
+            const i3 = i * 3;
+            positions[i3] = (Math.random() - 0.5) * 200;
+            positions[i3 + 1] = Math.random() * 200 - 100;
+            positions[i3 + 2] = (Math.random() - 0.5) * 100;
+            velocities.push(0.02 + Math.random() * 0.02);
+            opacities[i] = Math.random();
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute("opacity", new THREE.BufferAttribute(opacities, 1));
+
+        const vertexShader = `
+            attribute float opacity;
+            varying float vOpacity;
+            void main() {
+                vOpacity = opacity;
+                vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                gl_PointSize = 3.0 * (300.0 / -mvPosition.z);
+                gl_Position = projectionMatrix * mvPosition;
+            }
+        `;
+
+        const fragmentShader = `
+            varying float vOpacity;
+            void main() {
+                float dist = length(gl_PointCoord - vec2(0.5));
+                if (dist > 0.5) discard;
+                gl_FragColor = vec4(0.0, 1.0, 0.3, vOpacity * (1.0 - dist * 2.0));
+            }
+        `;
+
+        const material = new THREE.ShaderMaterial({
+            vertexShader,
+            fragmentShader,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+        });
+
+        const particles = new THREE.Points(geometry, material);
+        scene.add(particles);
+
+        let time = 0;
+
+        const animate = () => {
+            requestAnimationFrame(animate);
+            time += 0.016;
+
+            const posAttr = particles.geometry.attributes.position;
+            const opacityAttr = particles.geometry.attributes.opacity;
+
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                posAttr.array[i3 + 1] -= velocities[i];
+
+                if (posAttr.array[i3 + 1] < -100) {
+                    posAttr.array[i3 + 1] = 100;
+                    posAttr.array[i3] = (Math.random() - 0.5) * 200;
+                    opacityAttr.array[i] = Math.random();
+                }
+
+                opacityAttr.array[i] = Math.max(
+                    0,
+                    (posAttr.array[i3 + 1] + 100) / 200,
+                );
+            }
+
+            posAttr.needsUpdate = true;
+            opacityAttr.needsUpdate = true;
+
+            renderer.render(scene, camera);
+        };
+
+        animate();
+
+        const onResize = () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        };
+
+        window.addEventListener("resize", onResize);
+
+        (window as any).matrixBgInitialized = true;
+    }
+</script>
+
+<style>
+    #matrix-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        z-index: -1;
+    }
+</style>
